@@ -36,8 +36,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
             Options.BaseUrl = "https://cesiumjs.org/Cesium/Build/Documentation/";
             Options.Class.Add("Viewer");
             Options.Class.Add("DefaultProxy");
-         //   Options.Class.Add("Interval");
-         //   Options.Class.Add("EntityCollection");
+            Options.Class.Add("CesiumTerrainProvider");
+            Options.Class.Add("CzmlDataSource");
+            Options.Class.Add("EntityView");
+
+            // Options.Class.Add("PositionProperty");
             Options.OutputPath = @"C:\dev\AscendXYZ Portal\typings\Cesium.d.ts";
 
             if (CommandLine.Parser.Default.ParseArguments(args, Options))
@@ -77,6 +80,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
             File.Copy(local, Options.OutputPath,true); 
         }
         static Dictionary<string, string> urlsToClass = new Dictionary<string, string>();
+        static Dictionary<string, string> classExtents = new Dictionary<string, string>
+        {
+            { "CzmlDataSource", "extends Cesium.DataSource" }
+
+        };
         static string ExtractCLass(string url)
         {
             if (urlsToClass.ContainsKey(url))
@@ -110,16 +118,16 @@ namespace SInnovations.Cesium.TypescriptGenerator
                         var name = ctorParam.Key;
                         var type = ctorParam.Value;
 
-                        signature = signature.Replace(name, $"{name} : {type}");
+                        signature = signature.Replace(name.TrimEnd('?'), $"{name} : {type}");
 
                     }
                 }
             }
             var writer = GetWriter(className);
 
-         
 
-            writer.WriteLine($"export class {className}");
+            var extends = classExtents.ContainsKey(className) ? classExtents[className] : "";
+            writer.WriteLine($"export class {className} {extends}");
             writer.WriteLine("{");
             writer.WriteLine($"\tconstructor{signature};");
             ParseAndWriteMembers(doc, writer);
@@ -178,9 +186,24 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
                 var signatureParams = GetSignatureTypes(dt.SelectSingleNode(".//following-sibling::dd"));
 
+                var optionalFound = false;
                 signature = $@"({string.Join(", ", signature.Split(',')
                     .Select(s => s.Trim(')', '(', ' '))
-                    .Select(s => signatureParams.ContainsKey(s) ? $"{s} : {signatureParams[s]}" : s))})";
+                    .Select(s => {
+
+                        
+                        if (signatureParams.ContainsKey(s)) {
+                            
+                            return $"{s+(optionalFound?"?":"")} : {signatureParams[s].Replace("Object", "any")}";
+                        }
+                        if(signatureParams.ContainsKey(s + "?"))
+                        {
+                            optionalFound = true;
+                            return $"{s}? : {signatureParams[s + "?"].Replace("Object", "any")}";
+                        }
+                        return s;
+
+                       }))})";
 
              
                 writer.WriteLine($"\t{(staticMember == null ? "" : "static ")}{memberName}{signature.Replace("arguments", "args")} : {returnType}");
@@ -328,10 +351,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
         }
         private static string ArrayTypeFixer(string type)
         {
-            if (type.StartsWith("Array"))
+            if (type.StartsWith("Array<"))
                 return $"Array<{string.Join("|", type.Substring(6).TrimEnd('>').Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')'))))) }>";
             if(type.StartsWith("Promise<"))
                 return $"Promise<{string.Join("|", type.Substring(8).TrimEnd('>').Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')',' '))))) }>";
+           
             return type;
         }
         private static string TypeNormalizer(string type)
@@ -355,6 +379,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 case "Proxy": return "Cesium."+ExtractCLass($"{Options.BaseUrl.TrimEnd('/')}/DefaultProxy.html");
                 case "*": return "any";
                 case "undefined": return "void";
+                case "Array":return "Array<any>";
             }
 
             if (string.IsNullOrWhiteSpace(type))
