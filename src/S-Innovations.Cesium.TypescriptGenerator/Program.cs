@@ -172,6 +172,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
             Options.Class.Add("VelocityOrientationProperty");
             Options.Class.Add("Model");
             Options.Class.Add("viewerCesiumInspectorMixin");
+            Options.Class.Add("BingMapsApi");
 
 
             // Options.OutputPath = @"C:\dev\AscendXYZ Portal\typings\Cesium.d.ts";
@@ -201,10 +202,10 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 when.WriteLine("}");
                 when.WriteLine("export var when : CesiumWhenStatic");
 
-                var bingMapApi = GetWriter("BingMapApi");
-                bingMapApi.WriteLine("  export module BingMapsApi {");
-                bingMapApi.WriteLine("  var defaultKey;");
-                bingMapApi.WriteLine("}");
+                //var bingMapApi = GetWriter("BingMapApi");
+                //bingMapApi.WriteLine("  export module BingMapsApi {");
+                //bingMapApi.WriteLine("  var defaultKey;");
+                //bingMapApi.WriteLine("}");
 
                 var cesium = GetWriter("Cesium");
                 foreach (var cls in Directory.GetFiles("tempOut","*.*",SearchOption.AllDirectories)

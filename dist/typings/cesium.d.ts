@@ -1,9 +1,3 @@
-declare module 'cesium/BingMapApi' {
-	  export module BingMapsApi {
-	  var defaultKey;
-	}
-
-}
 declare module 'cesium/Promise' {
 	class Promise<T>
 	{
@@ -20,6 +14,20 @@ declare module 'cesium/when' {
 	<T>(promise:Promise<T>, succes:(result)=>void, fail:(result)=>void)
 	}
 	export var when : CesiumWhenStatic
+
+}
+declare module 'cesium/Core/BingMapsApi' {
+	class BingMapsApi 
+	{
+		constructor();
+		//Members
+		static defaultKey: string
+
+
+		//Methods
+
+	}
+	export = BingMapsApi
 
 }
 declare module 'cesium/Core/fromRandomOptions' {
@@ -4889,10 +4897,10 @@ declare module 'cesium/Widgets/Viewer/viewerCesiumInspectorMixin' {
 
 }
 declare module 'cesium/Cesium' {
-	export import BingMapApi = require('cesium/BingMapApi')
 	export import Cesium = require('cesium/Cesium')
 	export import Promise = require('cesium/Promise')
 	export import when = require('cesium/when')
+	export import BingMapsApi = require('cesium/Core/BingMapsApi')
 	export import BoundingSphere = require('cesium/Core/BoundingSphere')
 	export import Cartesian2 = require('cesium/Core/Cartesian2')
 	export import Cartesian3 = require('cesium/Core/Cartesian3')
