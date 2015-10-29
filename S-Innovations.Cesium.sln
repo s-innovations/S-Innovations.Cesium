@@ -10,6 +10,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "artifacts", "artifacts", "{
 		artifacts\Cesium.d.ts = artifacts\Cesium.d.ts
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dist", "dist", "{649F5C63-1BE8-49DD-8768-6463FE28B2EA}"
+	ProjectSection(SolutionItems) = preProject
+		dist\typings\cesium.d.ts = dist\typings\cesium.d.ts
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
