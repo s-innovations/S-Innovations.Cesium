@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using HtmlAgilityPack;
 
 namespace SInnovations.Cesium.TypescriptGenerator
@@ -171,8 +172,9 @@ namespace SInnovations.Cesium.TypescriptGenerator
             Options.Class.Add("VelocityOrientationProperty");
             Options.Class.Add("Model");
             Options.Class.Add("viewerCesiumInspectorMixin");
-            Options.Class.Add("FrameRateMonitor");
-           // Options.OutputPath = @"C:\dev\AscendXYZ Portal\typings\Cesium.d.ts";
+
+
+            // Options.OutputPath = @"C:\dev\AscendXYZ Portal\typings\Cesium.d.ts";
 
             if (CommandLine.Parser.Default.ParseArguments(args, Options))
             {
@@ -203,6 +205,17 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 bingMapApi.WriteLine("  export module BingMapsApi {");
                 bingMapApi.WriteLine("  var defaultKey;");
                 bingMapApi.WriteLine("}");
+
+                var cesium = GetWriter("Cesium");
+                foreach (var cls in Directory.GetFiles("tempOut","*.*",SearchOption.AllDirectories)
+                    .Select(f=>Path.GetFileName(f).Substring(0, Path.GetFileName(f).Length-5))
+                    .Where(f=>!f.EndsWith("Options"))) {
+                    WriteDependency(cesium, "Cesium.d.ts", cls,true);
+                }
+
+             
+
+
             }
             foreach (var writer in files.Values)
             {
@@ -221,7 +234,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 File.Copy(local, Options.OutputPath, true);
             if (Directory.Exists("../../../../artifacts/src"))
                 Directory.Delete("../../../../artifacts/src", true);
-
+            Thread.Sleep(1000);
             Directory.Move("tempOut", "../../../../artifacts/src");
         }
         static Dictionary<string, string> urlsToClass = new Dictionary<string, string>();
@@ -349,12 +362,17 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
             foreach (var dep in dependenciesList.Distinct().Where(d => d != signatureName))
             {
-                var path = classToPath.ContainsKey(dep) ? classToPath[dep] : dep;
-
-                var test = new Uri(Path.Combine(Directory.GetCurrentDirectory(),"tempOut", currentPath)).MakeRelativeUri(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "tempOut", path)));
-
-                writer.WriteLine($"import {dep} = require(\"./{test}\")");
+                WriteDependency(writer, currentPath, dep);
             }
+        }
+
+        private static void WriteDependency(StreamWriter writer, string currentPath, string dep, bool export = false)
+        {
+            var path = classToPath.ContainsKey(dep) ? classToPath[dep] : dep;
+
+            var test = new Uri(Path.Combine(Directory.GetCurrentDirectory(), "tempOut", currentPath)).MakeRelativeUri(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "tempOut", path)));
+
+            writer.WriteLine($"{(export?"export ":"")}import {dep} = require(\"./{test}\")");
         }
 
         private static HtmlDocument GetDocument(string url)

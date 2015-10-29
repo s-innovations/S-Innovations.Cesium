@@ -10,6 +10,7 @@ module.exports = function (grunt) {
                 name: 'cesium',
                 baseDir: '../../artifacts/src',
                 out: '../../dist/typings/cesium.d.ts',
+                main: 'cesium/Cesium'
               //  externs: ["./koExtensions/knockoutExtensions.d.ts", "./utils/utils.d.ts"]
 
             },

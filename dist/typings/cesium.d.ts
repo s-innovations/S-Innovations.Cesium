@@ -4,6 +4,24 @@ declare module 'cesium/BingMapApi' {
 	}
 
 }
+declare module 'cesium/Promise' {
+	class Promise<T>
+	{
+	constructor(doneHandler?:(obj:T)=>void,errorHandler?:(obj:any)=>void)
+	then(result:T);
+	}
+	export = Promise
+
+}
+declare module 'cesium/when' {
+	import Promise = require('cesium/Promise');
+	interface CesiumWhenStatic
+	{
+	<T>(promise:Promise<T>, succes:(result)=>void, fail:(result)=>void)
+	}
+	export var when : CesiumWhenStatic
+
+}
 declare module 'cesium/Core/fromRandomOptions' {
 	interface fromRandomOptions
 	{
@@ -727,15 +745,6 @@ declare module 'cesium/Core/TilingScheme' {
 
 	}
 	export = TilingScheme
-
-}
-declare module 'cesium/Promise' {
-	class Promise<T>
-	{
-	constructor(doneHandler?:(obj:T)=>void,errorHandler?:(obj:any)=>void)
-	then(result:T);
-	}
-	export = Promise
 
 }
 declare module 'cesium/Scene/ImageryLayerFeatureInfo' {
@@ -2203,6 +2212,11 @@ declare module 'cesium/Core/Clock' {
 	export = Clock
 
 }
+declare module 'cesium/Core/defaultValue' {
+	function defaultValue<T>(a,b:T) : T;
+	export = defaultValue
+
+}
 declare module 'cesium/Core/DeveloperError' {
 	class DeveloperError 
 	{
@@ -2252,6 +2266,11 @@ declare module 'cesium/Core/InterpolationAlgorithm' {
 	export = InterpolationAlgorithm
 
 }
+declare module 'cesium/Core/isArray' {
+	function isArray(value : any) : boolean;
+	export = isArray
+
+}
 declare module 'cesium/Core/ReferenceFrame' {
 	class ReferenceFrame 
 	{
@@ -2265,6 +2284,11 @@ declare module 'cesium/Core/ReferenceFrame' {
 
 	}
 	export = ReferenceFrame
+
+}
+declare module 'cesium/Core/requestAnimationFrame' {
+	function requestAnimationFrame(callback : any) : void;
+	export = requestAnimationFrame
 
 }
 declare module 'cesium/Core/ScreenSpaceEventHandler' {
@@ -2514,21 +2538,6 @@ declare module 'cesium/Core/WebMercatorTilingScheme' {
 
 	}
 	export = WebMercatorTilingScheme
-
-}
-declare module 'cesium/Core/defaultValue' {
-	function defaultValue<T>(a,b:T) : T;
-	export = defaultValue
-
-}
-declare module 'cesium/Core/isArray' {
-	function isArray(value : any) : boolean;
-	export = isArray
-
-}
-declare module 'cesium/Core/requestAnimationFrame' {
-	function requestAnimationFrame(callback : any) : void;
-	export = requestAnimationFrame
 
 }
 declare module 'cesium/DataSources/Property' {
@@ -3784,51 +3793,6 @@ declare module 'cesium/DataSources/VelocityOrientationProperty' {
 	export = VelocityOrientationProperty
 
 }
-declare module 'cesium/Scene/FrameRateMonitorOptions' {
-	import Scene = require('cesium/Scene/Scene')
-	interface FrameRateMonitorOptions
-	{
-		scene: Scene;
-		samplingWindow?: number;
-		quietPeriod?: number;
-		warmupPeriod?: number;
-		minimumFrameRateDuringWarmup?: number;
-		minimumFrameRateAfterWarmup?: number;
-	}
-	export = FrameRateMonitorOptions
-
-}
-declare module 'cesium/Scene/FrameRateMonitor' {
-	import FrameRateMonitorOptions = require('cesium/Scene/FrameRateMonitorOptions')
-	import Event = require('cesium/Core/Event')
-	import Scene = require('cesium/Scene/Scene')
-	class FrameRateMonitor 
-	{
-		constructor(options? : FrameRateMonitorOptions);
-		//Members
-		static defaultSettings: Object
-		lastFramesPerSecond: number
-		lowFrameRate: Event
-		minimumFrameRateAfterWarmup: number
-		minimumFrameRateDuringWarmup: number
-		nominalFrameRate: Event
-		quietPeriod: number
-		samplingWindow: number
-		scene: Scene
-		warmupPeriod: number
-
-
-		//Methods
-		static fromScene(scene : Scene) : FrameRateMonitor
-		destroy() : void
-		isDestroyed() : boolean
-		pause() : void
-		unpause() : void
-
-	}
-	export = FrameRateMonitor
-
-}
 declare module 'cesium/Scene/ModelOptions' {
 	import Matrix4 = require('cesium/Core/Matrix4')
 	interface ModelOptions
@@ -4924,12 +4888,148 @@ declare module 'cesium/Widgets/Viewer/viewerCesiumInspectorMixin' {
 	export = viewerCesiumInspectorMixin
 
 }
-declare module 'cesium/when' {
-	import Promise = require('cesium/Promise');
-	interface CesiumWhenStatic
-	{
-	<T>(promise:Promise<T>, succes:(result)=>void, fail:(result)=>void)
-	}
-	export var when : CesiumWhenStatic
+declare module 'cesium/Cesium' {
+	export import BingMapApi = require('cesium/BingMapApi')
+	export import Cesium = require('cesium/Cesium')
+	export import Promise = require('cesium/Promise')
+	export import when = require('cesium/when')
+	export import BoundingSphere = require('cesium/Core/BoundingSphere')
+	export import Cartesian2 = require('cesium/Core/Cartesian2')
+	export import Cartesian3 = require('cesium/Core/Cartesian3')
+	export import Cartesian4 = require('cesium/Core/Cartesian4')
+	export import Cartographic = require('cesium/Core/Cartographic')
+	export import CesiumMath = require('cesium/Core/CesiumMath')
+	export import CesiumTerrainProvider = require('cesium/Core/CesiumTerrainProvider')
+	export import Clock = require('cesium/Core/Clock')
+	export import ClockRange = require('cesium/Core/ClockRange')
+	export import ClockStep = require('cesium/Core/ClockStep')
+	export import Color = require('cesium/Core/Color')
+	export import Credit = require('cesium/Core/Credit')
+	export import DefaultProxy = require('cesium/Core/DefaultProxy')
+	export import defaultValue = require('cesium/Core/defaultValue')
+	export import DeveloperError = require('cesium/Core/DeveloperError')
+	export import EasingFunction = require('cesium/Core/EasingFunction')
+	export import Ellipsoid = require('cesium/Core/Ellipsoid')
+	export import Event = require('cesium/Core/Event')
+	export import ExtrapolationType = require('cesium/Core/ExtrapolationType')
+	export import GeographicTilingScheme = require('cesium/Core/GeographicTilingScheme')
+	export import GregorianDate = require('cesium/Core/GregorianDate')
+	export import InterpolationAlgorithm = require('cesium/Core/InterpolationAlgorithm')
+	export import Intersect = require('cesium/Core/Intersect')
+	export import Interval = require('cesium/Core/Interval')
+	export import isArray = require('cesium/Core/isArray')
+	export import JulianDate = require('cesium/Core/JulianDate')
+	export import LeapSecond = require('cesium/Core/LeapSecond')
+	export import MapProjection = require('cesium/Core/MapProjection')
+	export import Matrix3 = require('cesium/Core/Matrix3')
+	export import Matrix4 = require('cesium/Core/Matrix4')
+	export import Occluder = require('cesium/Core/Occluder')
+	export import OrientedBoundingBox = require('cesium/Core/OrientedBoundingBox')
+	export import Plane = require('cesium/Core/Plane')
+	export import Quaternion = require('cesium/Core/Quaternion')
+	export import Ray = require('cesium/Core/Ray')
+	export import Rectangle = require('cesium/Core/Rectangle')
+	export import ReferenceFrame = require('cesium/Core/ReferenceFrame')
+	export import requestAnimationFrame = require('cesium/Core/requestAnimationFrame')
+	export import ScreenSpaceEventHandler = require('cesium/Core/ScreenSpaceEventHandler')
+	export import ScreenSpaceEventType = require('cesium/Core/ScreenSpaceEventType')
+	export import Spherical = require('cesium/Core/Spherical')
+	export import TerrainData = require('cesium/Core/TerrainData')
+	export import TerrainMesh = require('cesium/Core/TerrainMesh')
+	export import TerrainProvider = require('cesium/Core/TerrainProvider')
+	export import TilingScheme = require('cesium/Core/TilingScheme')
+	export import TimeInterval = require('cesium/Core/TimeInterval')
+	export import TimeIntervalCollection = require('cesium/Core/TimeIntervalCollection')
+	export import TimeStandard = require('cesium/Core/TimeStandard')
+	export import Transforms = require('cesium/Core/Transforms')
+	export import WebMercatorProjection = require('cesium/Core/WebMercatorProjection')
+	export import WebMercatorTilingScheme = require('cesium/Core/WebMercatorTilingScheme')
+	export import BillboardGraphics = require('cesium/DataSources/BillboardGraphics')
+	export import BoxGraphics = require('cesium/DataSources/BoxGraphics')
+	export import CorridorGraphics = require('cesium/DataSources/CorridorGraphics')
+	export import CustomDataSource = require('cesium/DataSources/CustomDataSource')
+	export import CylinderGraphics = require('cesium/DataSources/CylinderGraphics')
+	export import CzmlDataSource = require('cesium/DataSources/CzmlDataSource')
+	export import DataSource = require('cesium/DataSources/DataSource')
+	export import DataSourceClock = require('cesium/DataSources/DataSourceClock')
+	export import DataSourceCollection = require('cesium/DataSources/DataSourceCollection')
+	export import DataSourceDisplay = require('cesium/DataSources/DataSourceDisplay')
+	export import EllipseGraphics = require('cesium/DataSources/EllipseGraphics')
+	export import EllipsoidGraphics = require('cesium/DataSources/EllipsoidGraphics')
+	export import Entity = require('cesium/DataSources/Entity')
+	export import EntityCollection = require('cesium/DataSources/EntityCollection')
+	export import EntityView = require('cesium/DataSources/EntityView')
+	export import LabelGraphics = require('cesium/DataSources/LabelGraphics')
+	export import MaterialProperty = require('cesium/DataSources/MaterialProperty')
+	export import ModelGraphics = require('cesium/DataSources/ModelGraphics')
+	export import PathGraphics = require('cesium/DataSources/PathGraphics')
+	export import PointGraphics = require('cesium/DataSources/PointGraphics')
+	export import PolygonGraphics = require('cesium/DataSources/PolygonGraphics')
+	export import PolylineGraphics = require('cesium/DataSources/PolylineGraphics')
+	export import PolylineVolumeGraphics = require('cesium/DataSources/PolylineVolumeGraphics')
+	export import PositionProperty = require('cesium/DataSources/PositionProperty')
+	export import Property = require('cesium/DataSources/Property')
+	export import RectangleGraphics = require('cesium/DataSources/RectangleGraphics')
+	export import SampledPositionProperty = require('cesium/DataSources/SampledPositionProperty')
+	export import TimeIntervalCollectionProperty = require('cesium/DataSources/TimeIntervalCollectionProperty')
+	export import VelocityOrientationProperty = require('cesium/DataSources/VelocityOrientationProperty')
+	export import WallGraphics = require('cesium/DataSources/WallGraphics')
+	export import Camera = require('cesium/Scene/Camera')
+	export import CameraEventType = require('cesium/Scene/CameraEventType')
+	export import CullingVolume = require('cesium/Scene/CullingVolume')
+	export import Globe = require('cesium/Scene/Globe')
+	export import HeadingPitchRange = require('cesium/Scene/HeadingPitchRange')
+	export import ImageryLayer = require('cesium/Scene/ImageryLayer')
+	export import ImageryLayerCollection = require('cesium/Scene/ImageryLayerCollection')
+	export import ImageryLayerFeatureInfo = require('cesium/Scene/ImageryLayerFeatureInfo')
+	export import ImageryProvider = require('cesium/Scene/ImageryProvider')
+	export import Model = require('cesium/Scene/Model')
+	export import ModelAnimation = require('cesium/Scene/ModelAnimation')
+	export import ModelAnimationCollection = require('cesium/Scene/ModelAnimationCollection')
+	export import ModelAnimationLoop = require('cesium/Scene/ModelAnimationLoop')
+	export import ModelMaterial = require('cesium/Scene/ModelMaterial')
+	export import ModelMesh = require('cesium/Scene/ModelMesh')
+	export import ModelNode = require('cesium/Scene/ModelNode')
+	export import Moon = require('cesium/Scene/Moon')
+	export import PerspectiveFrustum = require('cesium/Scene/PerspectiveFrustum')
+	export import PrimitiveCollection = require('cesium/Scene/PrimitiveCollection')
+	export import Scene = require('cesium/Scene/Scene')
+	export import SceneMode = require('cesium/Scene/SceneMode')
+	export import ScreenSpaceCameraController = require('cesium/Scene/ScreenSpaceCameraController')
+	export import SkyAtmosphere = require('cesium/Scene/SkyAtmosphere')
+	export import SkyBox = require('cesium/Scene/SkyBox')
+	export import Sun = require('cesium/Scene/Sun')
+	export import TileDiscardPolicy = require('cesium/Scene/TileDiscardPolicy')
+	export import WebMapTileServiceImageryProvider = require('cesium/Scene/WebMapTileServiceImageryProvider')
+	export import ClockViewModel = require('cesium/Widgets/ClockViewModel')
+	export import Command = require('cesium/Widgets/Command')
+	export import ToggleButtonViewModel = require('cesium/Widgets/ToggleButtonViewModel')
+	export import Animation = require('cesium/Widgets/Animation/Animation')
+	export import AnimationViewModel = require('cesium/Widgets/Animation/AnimationViewModel')
+	export import BaseLayerPicker = require('cesium/Widgets/BaseLayerPicker/BaseLayerPicker')
+	export import BaseLayerPickerViewModel = require('cesium/Widgets/BaseLayerPicker/BaseLayerPickerViewModel')
+	export import ProviderViewModel = require('cesium/Widgets/BaseLayerPicker/ProviderViewModel')
+	export import CesiumWidget = require('cesium/Widgets/CesiumWidget/CesiumWidget')
+	export import FullscreenButton = require('cesium/Widgets/FullscreenButton/FullscreenButton')
+	export import FullscreenButtonViewModel = require('cesium/Widgets/FullscreenButton/FullscreenButtonViewModel')
+	export import Geocoder = require('cesium/Widgets/Geocoder/Geocoder')
+	export import GeocoderViewModel = require('cesium/Widgets/Geocoder/GeocoderViewModel')
+	export import HomeButton = require('cesium/Widgets/HomeButton/HomeButton')
+	export import HomeButtonViewModel = require('cesium/Widgets/HomeButton/HomeButtonViewModel')
+	export import InfoBox = require('cesium/Widgets/InfoBox/InfoBox')
+	export import InfoBoxViewModel = require('cesium/Widgets/InfoBox/InfoBoxViewModel')
+	export import NavigationHelpButton = require('cesium/Widgets/NavigationHelpButton/NavigationHelpButton')
+	export import NavigationHelpButtonViewModel = require('cesium/Widgets/NavigationHelpButton/NavigationHelpButtonViewModel')
+	export import SceneModePicker = require('cesium/Widgets/SceneModePicker/SceneModePicker')
+	export import SceneModePickerViewModel = require('cesium/Widgets/SceneModePicker/SceneModePickerViewModel')
+	export import SelectionIndicator = require('cesium/Widgets/SelectionIndicator/SelectionIndicator')
+	export import SelectionIndicatorViewModel = require('cesium/Widgets/SelectionIndicator/SelectionIndicatorViewModel')
+	export import Timeline = require('cesium/Widgets/Timeline/Timeline')
+	export import Viewer = require('cesium/Widgets/Viewer/Viewer')
+    export import viewerCesiumInspectorMixin = require('cesium/Widgets/Viewer/viewerCesiumInspectorMixin')
 
+}
+declare module 'cesium' {
+	import main = require('cesium/Cesium');
+	export = main;
 }
