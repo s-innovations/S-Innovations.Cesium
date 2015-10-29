@@ -3801,6 +3801,51 @@ declare module 'cesium/DataSources/VelocityOrientationProperty' {
 	export = VelocityOrientationProperty
 
 }
+declare module 'cesium/Scene/FrameRateMonitorOptions' {
+	import Scene = require('cesium/Scene/Scene')
+	interface FrameRateMonitorOptions
+	{
+		scene: Scene;
+		samplingWindow?: number;
+		quietPeriod?: number;
+		warmupPeriod?: number;
+		minimumFrameRateDuringWarmup?: number;
+		minimumFrameRateAfterWarmup?: number;
+	}
+	export = FrameRateMonitorOptions
+
+}
+declare module 'cesium/Scene/FrameRateMonitor' {
+	import FrameRateMonitorOptions = require('cesium/Scene/FrameRateMonitorOptions')
+	import Event = require('cesium/Core/Event')
+	import Scene = require('cesium/Scene/Scene')
+	class FrameRateMonitor 
+	{
+		constructor(options? : FrameRateMonitorOptions);
+		//Members
+		static defaultSettings: Object
+		lastFramesPerSecond: number
+		lowFrameRate: Event
+		minimumFrameRateAfterWarmup: number
+		minimumFrameRateDuringWarmup: number
+		nominalFrameRate: Event
+		quietPeriod: number
+		samplingWindow: number
+		scene: Scene
+		warmupPeriod: number
+
+
+		//Methods
+		static fromScene(scene : Scene) : FrameRateMonitor
+		destroy() : void
+		isDestroyed() : boolean
+		pause() : void
+		unpause() : void
+
+	}
+	export = FrameRateMonitor
+
+}
 declare module 'cesium/Scene/ModelOptions' {
 	import Matrix4 = require('cesium/Core/Matrix4')
 	interface ModelOptions
@@ -4985,6 +5030,7 @@ declare module 'cesium/Cesium' {
 	export import Camera = require('cesium/Scene/Camera')
 	export import CameraEventType = require('cesium/Scene/CameraEventType')
 	export import CullingVolume = require('cesium/Scene/CullingVolume')
+	export import FrameRateMonitor = require('cesium/Scene/FrameRateMonitor')
 	export import Globe = require('cesium/Scene/Globe')
 	export import HeadingPitchRange = require('cesium/Scene/HeadingPitchRange')
 	export import ImageryLayer = require('cesium/Scene/ImageryLayer')

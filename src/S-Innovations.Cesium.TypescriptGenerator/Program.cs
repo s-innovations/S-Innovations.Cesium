@@ -173,6 +173,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
             Options.Class.Add("Model");
             Options.Class.Add("viewerCesiumInspectorMixin");
             Options.Class.Add("BingMapsApi");
+            Options.Class.Add("FrameRateMonitor");
 
 
             // Options.OutputPath = @"C:\dev\AscendXYZ Portal\typings\Cesium.d.ts";
