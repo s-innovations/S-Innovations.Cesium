@@ -1,0 +1,22 @@
+{
+  "name": "cesium-ts",
+  "private": true,
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "exportsOverride": {
+  },
+  "authors": [ "Poul Kjeldager Sørensen" ],
+  "homepage": "www.s-innovations.net",
+  "description": "A repository to help you develop typescript/html applications with cesium",
+  "license": "MIT",
+  "ignore": [    
+    "*",
+    "!dist/**/*"
+  ],
+  "version": "0.0.1",
+  "typescript": {
+        "definition": "dist/typings/cesium.d.ts"
+    }
+}
