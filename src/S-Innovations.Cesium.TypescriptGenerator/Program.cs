@@ -210,7 +210,8 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 foreach (var cls in Directory.GetFiles("tempOut","*.*",SearchOption.AllDirectories)
                     .Select(f=>Path.GetFileName(f).Substring(0, Path.GetFileName(f).Length-5))
                     .Where(f=>!f.EndsWith("Options"))) {
-                    WriteDependency(cesium, "Cesium.d.ts", cls,true);
+
+                    WriteDependency(cesium, "Cesium.d.ts", cls,true, cls == "CesiumMath" ? "Math":null);
                 }
 
              
@@ -366,13 +367,13 @@ namespace SInnovations.Cesium.TypescriptGenerator
             }
         }
 
-        private static void WriteDependency(StreamWriter writer, string currentPath, string dep, bool export = false)
+        private static void WriteDependency(StreamWriter writer, string currentPath, string dep, bool export = false, string localName = null)
         {
             var path = classToPath.ContainsKey(dep) ? classToPath[dep] : dep;
 
             var test = new Uri(Path.Combine(Directory.GetCurrentDirectory(), "tempOut", currentPath)).MakeRelativeUri(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "tempOut", path)));
 
-            writer.WriteLine($"{(export?"export ":"")}import {dep} = require(\"./{test}\")");
+            writer.WriteLine($"{(export?"export ":"")}import {(localName==null? dep : localName)} = require(\"./{test}\")");
         }
 
         private static HtmlDocument GetDocument(string url)

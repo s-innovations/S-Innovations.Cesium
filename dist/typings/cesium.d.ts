@@ -4898,7 +4898,7 @@ declare module 'cesium/Cesium' {
 	export import Cartesian3 = require('cesium/Core/Cartesian3')
 	export import Cartesian4 = require('cesium/Core/Cartesian4')
 	export import Cartographic = require('cesium/Core/Cartographic')
-	export import CesiumMath = require('cesium/Core/CesiumMath')
+	export import Math = require('cesium/Core/CesiumMath')
 	export import CesiumTerrainProvider = require('cesium/Core/CesiumTerrainProvider')
 	export import Clock = require('cesium/Core/Clock')
 	export import ClockRange = require('cesium/Core/ClockRange')
@@ -5026,7 +5026,7 @@ declare module 'cesium/Cesium' {
 	export import SelectionIndicatorViewModel = require('cesium/Widgets/SelectionIndicator/SelectionIndicatorViewModel')
 	export import Timeline = require('cesium/Widgets/Timeline/Timeline')
 	export import Viewer = require('cesium/Widgets/Viewer/Viewer')
-    export import viewerCesiumInspectorMixin = require('cesium/Widgets/Viewer/viewerCesiumInspectorMixin')
+	export import viewerCesiumInspectorMixin = require('cesium/Widgets/Viewer/viewerCesiumInspectorMixin')
 
 }
 declare module 'cesium' {
