@@ -211,7 +211,8 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 var cesium = GetWriter("Cesium");
                 foreach (var cls in Directory.GetFiles("tempOut","*.*",SearchOption.AllDirectories)
                     .Select(f=>Path.GetFileName(f).Substring(0, Path.GetFileName(f).Length-5))
-                    .Where(f=>!f.EndsWith("Options"))) {
+                    .Where(f=>!f.EndsWith("Options"))
+                    .Where(f=>f!="Cesium")) {
 
                     WriteDependency(cesium, "Cesium.d.ts", cls,true, cls == "CesiumMath" ? "Math":null);
                 }

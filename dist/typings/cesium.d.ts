@@ -4942,7 +4942,6 @@ declare module 'cesium/Widgets/Viewer/viewerCesiumInspectorMixin' {
 
 }
 declare module 'cesium/Cesium' {
-	export import Cesium = require('cesium/Cesium')
 	export import Promise = require('cesium/Promise')
 	export import when = require('cesium/when')
 	export import BingMapsApi = require('cesium/Core/BingMapsApi')
