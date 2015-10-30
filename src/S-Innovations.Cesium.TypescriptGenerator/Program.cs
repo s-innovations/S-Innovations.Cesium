@@ -197,11 +197,8 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
                 var when = GetWriter("when");
                 when.WriteLine("import Promise = require(\"./Promise\");");
-                when.WriteLine("interface CesiumWhenStatic");
-                when.WriteLine("{");
-                when.WriteLine("<T>(promise:Promise<T>, succes:(result)=>void, fail:(result)=>void)");         
-                when.WriteLine("}");
-                when.WriteLine("export var when : CesiumWhenStatic");
+                when.WriteLine("function when<T>(promise:Promise<T>, succes:(result)=>void, fail:(result)=>void) : void");         
+                when.WriteLine("export = when;");
 
                 //var bingMapApi = GetWriter("BingMapApi");
                 //bingMapApi.WriteLine("  export module BingMapsApi {");

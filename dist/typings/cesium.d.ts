@@ -9,11 +9,8 @@ declare module 'cesium/Promise' {
 }
 declare module 'cesium/when' {
 	import Promise = require('cesium/Promise');
-	interface CesiumWhenStatic
-	{
-	<T>(promise:Promise<T>, succes:(result)=>void, fail:(result)=>void)
-	}
-	export var when : CesiumWhenStatic
+	function when<T>(promise:Promise<T>, succes:(result)=>void, fail:(result)=>void) : void
+	export = when;
 
 }
 declare module 'cesium/Core/BingMapsApi' {
