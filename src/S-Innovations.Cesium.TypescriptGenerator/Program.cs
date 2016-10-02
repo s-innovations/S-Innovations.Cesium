@@ -151,29 +151,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 Directory.Delete("tempOut",true);
 
             Options.BaseUrl = "https://cesiumjs.org/Cesium/Build/Documentation/";
-            Options.Class.Add("Viewer");
-            Options.Class.Add("DefaultProxy");
-            Options.Class.Add("CesiumTerrainProvider");
-            Options.Class.Add("CzmlDataSource");
-            Options.Class.Add("EntityView");
-            Options.Class.Add("ScreenSpaceEventType");
-            Options.Class.Add("TimeIntervalCollectionProperty");
-            Options.Class.Add("DeveloperError");
-            Options.Class.Add("Transforms");
-            Options.Class.Add("defaultValue");
-            Options.Class.Add("isArray");
-            Options.Class.Add("requestAnimationFrame");
-            Options.Class.Add("TerrainProvider");
-            Options.Class.Add("CesiumMath");
-            Options.Class.Add("WebMapTileServiceImageryProvider");
-            Options.Class.Add("WebMercatorTilingScheme");
-            Options.Class.Add("WebMercatorProjection");
-            Options.Class.Add("SampledPositionProperty");
-            Options.Class.Add("VelocityOrientationProperty");
-            Options.Class.Add("Model");
-            Options.Class.Add("viewerCesiumInspectorMixin");
-            Options.Class.Add("BingMapsApi");
-            Options.Class.Add("FrameRateMonitor");
+			HtmlDocument index = GetDocument($"{Options.BaseUrl.TrimEnd('/')}/index.html");
+			var classLinks = index.DocumentNode.SelectNodes(@"//*[@id=""ClassList""]/li");
+			foreach (var link in classLinks) {
+				Options.Class.Add(link.InnerText);
+			}
 
 
             // Options.OutputPath = @"C:\dev\AscendXYZ Portal\typings\Cesium.d.ts";
