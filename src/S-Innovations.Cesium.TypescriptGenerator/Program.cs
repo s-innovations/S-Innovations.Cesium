@@ -16,6 +16,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
     {
         private string _name;
         private string _source;
+		private int _brokenId = 0;
         public OptionsWriter(string name,string source)
         {
             _name = name;
@@ -28,11 +29,22 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 return new Dictionary<string, string>();
 
             var rows = signatureParams.Elements("tr");
-            return rows.ToDictionary(
-                VariableNameResolver,
-                VariableTypeResolver);
+			try {
+	            return rows.ToDictionary(
+	                VariableNameResolver,
+	                VariableTypeResolver);
+			} catch (ArgumentException ex) {
+				return rows.ToDictionary(
+					BrokenVariableNameResolver,
+					VariableTypeResolver);
+			}
 
         }
+		private string BrokenVariableNameResolver(HtmlNode row)
+		{
+			var originalName = VariableNameResolver(row);
+			return originalName + _brokenId++;
+		}
         private string VariableNameResolver(HtmlNode row)
         {
             var isOptional = row.SelectSingleNode(@".//td[contains(@class,'description')]/span[@class='optional']");
