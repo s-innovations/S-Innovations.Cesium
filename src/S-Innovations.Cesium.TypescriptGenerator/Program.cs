@@ -245,7 +245,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
             // var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dd/dl/div") ?? doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dl/div");
 			var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[contains(@class, ""source-link"")]");
-            var source = sourceLinkNode.SelectSingleNode(".//a").InnerText.Substring(0, sourceLinkNode.SelectSingleNode(".//a").InnerText.LastIndexOf(" "));
+            var source = "Source/" + sourceLinkNode.SelectSingleNode(".//a").InnerText.Substring(0, sourceLinkNode.SelectSingleNode(".//a").InnerText.LastIndexOf(" "));
             Console.WriteLine($"Source : {source}");
 
             var classdt = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dt");
