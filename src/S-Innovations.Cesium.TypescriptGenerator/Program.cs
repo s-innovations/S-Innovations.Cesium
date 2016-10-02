@@ -243,8 +243,9 @@ namespace SInnovations.Cesium.TypescriptGenerator
             Console.WriteLine($"Dowloadinging {url}");
             HtmlDocument doc = GetDocument(url);
 
-            var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dd/dl/div") ?? doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dl/div");
-            var source = sourceLinkNode.SelectSingleNode(".//a").InnerText.Substring(0, sourceLinkNode.SelectSingleNode(".//a").InnerText.LastIndexOf(","));
+            // var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dd/dl/div") ?? doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dl/div");
+			var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[contains(@class, ""source-link"")]");
+            var source = sourceLinkNode.SelectSingleNode(".//a").InnerText.Substring(0, sourceLinkNode.SelectSingleNode(".//a").InnerText.LastIndexOf(" "));
             Console.WriteLine($"Source : {source}");
 
             var classdt = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dt");
@@ -465,25 +466,26 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 var signatureParams = optionsParser.GetSignatureTypes(dt.SelectSingleNode(".//following-sibling::dd"));
 
                 var optionalFound = false;
-                signature = $@"({string.Join(", ", signature.Split(',')
-                    .Select(s => s.Trim(')', '(', ' '))
-                    .Select(s =>
-                    {
+				var sigInner = string.Join(", ", signature.Split(',')
+					.Select(s => s.Trim(')', '(', ' '))
+					.Select(s =>
+						{
+							if (signatureParams.ContainsKey(s))
+							{
 
+								// return $"{s + (optionalFound ? "?" : "")} : { extractDependencies(dependencies,signatureParams[s].Replace("Object", "any"))}";
+								return (s + (optionalFound ? "?" : "")) + " : " + extractDependencies(dependencies,signatureParams[s].Replace("Object", "any"));
+							}
+							if (signatureParams.ContainsKey(s + "?"))
+							{
+								optionalFound = true;
+								//return $"{s}? : {extractDependencies(dependencies, signatureParams[s + "?"].Replace("Object", "any"))}";
+								return s + " : " + extractDependencies(dependencies, signatureParams[s + "?"].Replace("Object", "any"));
+							}
+							return s;
 
-                        if (signatureParams.ContainsKey(s))
-                        {
-
-                            return $"{s + (optionalFound ? "?" : "")} : { extractDependencies(dependencies,signatureParams[s].Replace("Object", "any"))}";
-                        }
-                        if (signatureParams.ContainsKey(s + "?"))
-                        {
-                            optionalFound = true;
-                            return $"{s}? : {extractDependencies(dependencies, signatureParams[s + "?"].Replace("Object", "any"))}";
-                        }
-                        return s;
-
-                    }))})";
+						}));
+                signature = "(" + sigInner + ")";
 
 
                 writer.WriteLine($"\t{(staticMember == null ? "" : "static ")}{memberName}{signature.Replace("arguments", "args")} : {typeList}");
