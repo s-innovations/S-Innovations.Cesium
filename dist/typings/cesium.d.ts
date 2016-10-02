@@ -1211,10 +1211,10 @@ declare module 'cesium/Source/Scene/ImageryProvider' {
 
 
 		//Methods
-		static loadImage(url : string) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		static loadImage(url : string) : Promise<Image | Canvas>|void
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = ImageryProvider
@@ -4594,7 +4594,7 @@ declare module 'cesium/Source/Core/TileProviderError' {
 	import Event = require('cesium/Source/Core/Event')
 	class TileProviderError 
 	{
-		constructor(provider : Imagery? : numberProvider|TerrainProvider, message : string, x? : number, y? : number, level? : number, timesRetried? : number, error? : Error);
+		constructor(provider : ImageryProvider|TerrainProvider, message : string, x? : number, y? : number, level? : number, timesRetried? : number, error? : Error);
 		//Members
 		error: Error
 		level: number
@@ -5236,7 +5236,7 @@ declare module 'cesium/Source/Core/subdivideArray' {
 
 }
 declare module 'cesium/Source/Core/throttleRequestByServer' {
-	function throttleRequestByServer(url : string, requestFunction : any) : Promise<Object>|void>;
+	function throttleRequestByServer(url : string, requestFunction : any) : Promise<Object>|void;
 	export = throttleRequestByServer
 
 }
@@ -7273,34 +7273,6 @@ declare module 'cesium/Source/DataSources/KmlDataSource' {
 	export = KmlDataSource
 
 }
-declare module 'cesium/Source/DataSources/KmlFeatureData' {
-	class KmlFeatureData 
-	{
-		constructor();
-		//Members
-		address: string
-		author: Object
-		author.email: string
-		author.name: string
-		author.uri: string
-		extendedData: string
-		link: Object
-		link.href: string
-		link.hreflang: string
-		link.length: string
-		link.rel: string
-		link.title: string
-		link.type: string
-		phoneNumber: string
-		snippet: string
-
-
-		//Methods
-
-	}
-	export = KmlFeatureData
-
-}
 declare module 'cesium/Source/DataSources/LabelVisualizer' {
 	import Scene = require('cesium/Source/Scene/Scene')
 	import EntityCollection = require('cesium/Source/DataSources/EntityCollection')
@@ -8127,7 +8099,7 @@ declare module 'cesium/Source/Scene/ArcGisMapServerImageryProvider' {
 		//Methods
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = ArcGisMapServerImageryProvider
@@ -8342,7 +8314,7 @@ declare module 'cesium/Source/Scene/BingMapsImageryProvider' {
 		static tileXYToQuadKey(x : number, y : number, level : number) : void
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = BingMapsImageryProvider
@@ -8755,7 +8727,7 @@ declare module 'cesium/Source/Scene/GoogleEarthImageryProvider' {
 		//Methods
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = GoogleEarthImageryProvider
@@ -8812,7 +8784,7 @@ declare module 'cesium/Source/Scene/GridImageryProvider' {
 		_drawGrid() : void
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = GridImageryProvider
@@ -9020,7 +8992,7 @@ declare module 'cesium/Source/Scene/MapboxImageryProvider' {
 		//Methods
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = MapboxImageryProvider
@@ -9794,7 +9766,7 @@ declare module 'cesium/Source/Scene/SingleTileImageryProvider' {
 		//Methods
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = SingleTileImageryProvider
@@ -9889,7 +9861,7 @@ declare module 'cesium/Source/Scene/TileCoordinatesImageryProvider' {
 		//Methods
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = TileCoordinatesImageryProvider
@@ -9930,7 +9902,7 @@ declare module 'cesium/Source/Scene/UrlTemplateImageryProvider' {
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
 		reinitialize(options : Promise<any>|any) : void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = UrlTemplateImageryProvider
@@ -10021,7 +9993,7 @@ declare module 'cesium/Source/Scene/WebMapServiceImageryProvider' {
 		//Methods
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = WebMapServiceImageryProvider
@@ -10088,7 +10060,7 @@ declare module 'cesium/Source/Scene/WebMapTileServiceImageryProvider' {
 		//Methods
 		getTileCredits(x : number, y : number, level : number) : Array<Credit>
 		pickFeatures(x : number, y : number, level : number, longitude : number, latitude : number) : Promise<Array<ImageryLayerFeatureInfo>>|void
-		requestImage(x : number, y : number, level : number) : Promise<HTMLImageElement|HTMLCanvasElement>|void
+		requestImage(x : number, y : number, level : number) : Promise<Image | Canvas>|void
 
 	}
 	export = WebMapTileServiceImageryProvider
@@ -11177,12 +11149,12 @@ declare module 'cesium/Source/Widgets/Viewer/Viewer' {
 		//Methods
 		destroy() : void
 		extend(mixin : any, options : any) : void
-		flyTo(target : Entity|Array<Entity>|EntityCollection|DataSource|ImageryLayer|Promise<Entity|Array<Entity>|EntityCollection|DataSource|ImageryLayer>, options : flyToOptions) : Promise<boolean>
+		flyTo(target : Entity|Array<Entity>|EntityCollection|DataSource|ImageryLayer|Promise<Entity | Array<Entity> | EntityCollection | DataSource | ImageryLayer>, options : flyToOptions) : Promise<boolean>
 		forceResize() : void
 		isDestroyed() : boolean
 		render() : void
 		resize() : void
-		zoomTo(target : Entity|Array<Entity>|EntityCollection|DataSource|ImageryLayer|Promise<Entity|Array<Entity>|EntityCollection|DataSource|ImageryLayer>, offset : HeadingPitchRange) : Promise<boolean>
+		zoomTo(target : Entity|Array<Entity>|EntityCollection|DataSource|ImageryLayer|Promise<Entity | Array<Entity> | EntityCollection | DataSource | ImageryLayer>, offset : HeadingPitchRange) : Promise<boolean>
 
 	}
 	export = Viewer
@@ -11223,7 +11195,7 @@ declare module 'cesium/Source/Widgets/Viewer/viewerPerformanceWatchdogMixin' {
 
 }
 declare module 'cesium/Source/Workers/createTaskProcessorWorker' {
-	function createTaskProcessorWorker(workerFunction : any) : createTaskProcessorWorker~TaskProcessorWorkerFunction;
+	function createTaskProcessorWorker(workerFunction : any) : any;
 	export = createTaskProcessorWorker
 
 }
@@ -11435,7 +11407,6 @@ declare module 'cesium/Cesium' {
 	export import GridMaterialProperty = require('cesium/Source/DataSources/GridMaterialProperty')
 	export import ImageMaterialProperty = require('cesium/Source/DataSources/ImageMaterialProperty')
 	export import KmlDataSource = require('cesium/Source/DataSources/KmlDataSource')
-	export import KmlFeatureData = require('cesium/Source/DataSources/KmlFeatureData')
 	export import LabelGraphics = require('cesium/Source/DataSources/LabelGraphics')
 	export import LabelVisualizer = require('cesium/Source/DataSources/LabelVisualizer')
 	export import MaterialProperty = require('cesium/Source/DataSources/MaterialProperty')

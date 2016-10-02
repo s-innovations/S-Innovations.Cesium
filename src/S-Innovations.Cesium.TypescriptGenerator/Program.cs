@@ -107,7 +107,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
             }
 
-            return string.Join("|", types);
+			return string.Join("|", types);
 
         }
     }
@@ -135,6 +135,9 @@ namespace SInnovations.Cesium.TypescriptGenerator
         {
             {"Cesium.Property", "Cesium.Property|string" }
         };
+		static ISet<string> excludedClasses = new HashSet<string> {
+			"KmlFeatureData"
+		};
 
         static Dictionary<string, string> classToPath = new Dictionary<string, string>();
         public static StreamWriter GetWriter(string className, string source = ".")
@@ -177,8 +180,10 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
                 foreach (var name in Options.Class)
                 {
-                    var url = $"{Options.BaseUrl.TrimEnd('/')}/{name}.html";
-                    ExtractCLass(url);
+					if (!excludedClasses.Contains(name)) {
+	                    var url = $"{Options.BaseUrl.TrimEnd('/')}/{name}.html";
+	                    ExtractCLass(url);
+					}
                 }
 
                 var promish = GetWriter("Promise");
@@ -262,6 +267,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 if (nameMaps.ContainsKey(signatureName))
                     signatureName = nameMaps[signatureName];
 
+				Console.WriteLine ($"Writing: {source}");
                 writer = GetWriter(signatureName, source);
 
                 var optionsParser = new OptionsWriter(signatureName,source);
@@ -289,9 +295,8 @@ namespace SInnovations.Cesium.TypescriptGenerator
                         
                         types = extractDependencies(dependencies, types);
 
-
-                        signature = signature.Replace(name.TrimEnd('?'), $"{name} : {types}");
-
+						var replaceRx = new Regex(@"\b" + name.TrimEnd('?'));
+						signature = replaceRx.Replace(signature, $"{name} : {types}");
                     }
                 }
             }
@@ -414,7 +419,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 var types = TypeReader(member.SelectSingleNode(".//span[@class='type-signature']"));
                 types = extractDependencies(dependencies, types);
 
-                writer.WriteLine($"\t{(staticMember != null && !isInterface ? "static " : "")}{memberName}: {types}");
+				writer.WriteLine($"\t{(staticMember != null && !isInterface ? "static " : "")}{memberName}: {types}");
 
             }
 
@@ -521,8 +526,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
             var type = typeNode.InnerText
                   .Replace(System.Environment.NewLine, " ").Trim(' ', ':');
 
-            if (type.Contains("~"))
-                return "any"; //Do not go to ~links atm
+			Console.WriteLine(type);
+			if (type.Contains("~")) {
+				Console.WriteLine("^^ skipping above");
+            	return "any"; //Do not go to ~links atm
+			}
 
             var links = typeNode.SelectNodes(@".//a");
             if (links != null)
@@ -566,6 +574,10 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
             }
             var returnType = string.Join("|", CollapsGeneric(type.Replace(".&lt;", "<").Split('|')).Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')')))));
+			if (returnType.Contains("~")) {
+				Console.WriteLine($"skipping {returnType} as return");
+				return "any";
+			}
             return TypeReplacer(returnType);
 
 
@@ -601,8 +613,15 @@ namespace SInnovations.Cesium.TypescriptGenerator
         {
             if (type.StartsWith("Array<"))
                 return $"Array<{string.Join("|", type.Substring(6).TrimEnd('>').Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')'))))) }>";
-            if (type.StartsWith("Promise<"))
-                return $"Promise<{string.Join("|", type.Substring(8).TrimEnd('>').Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')', ' '))))) }>";
+			if (type.StartsWith("Promise<")) {
+				var types = Regex.Split(type, @"(?<=\>)\|");
+				if (types.Length > 1) {
+					return string.Join("|", types.Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')')))).ToArray());
+				}
+				var origTypedef = type.Substring(8).TrimEnd('>');
+				var promiseTypes = string.Join("|", origTypedef.Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')')))));
+                return $"Promise<{promiseTypes}>";
+			}
 
             return type;
         }
@@ -614,6 +633,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
         {
             if (type == null)
                 return "void";
+
+			if (type.Contains("~")) {
+				Console.WriteLine("skipping typenormalizer " + type);
+				return "any";
+			}
 
 
 
