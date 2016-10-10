@@ -16,6 +16,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
     {
         private string _name;
         private string _source;
+		private int _brokenId = 0;
         public OptionsWriter(string name,string source)
         {
             _name = name;
@@ -28,11 +29,22 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 return new Dictionary<string, string>();
 
             var rows = signatureParams.Elements("tr");
-            return rows.ToDictionary(
-                VariableNameResolver,
-                VariableTypeResolver);
+			try {
+	            return rows.ToDictionary(
+	                VariableNameResolver,
+	                VariableTypeResolver);
+			} catch (ArgumentException ex) {
+				return rows.ToDictionary(
+					BrokenVariableNameResolver,
+					VariableTypeResolver);
+			}
 
         }
+		private string BrokenVariableNameResolver(HtmlNode row)
+		{
+			var originalName = VariableNameResolver(row);
+			return originalName + _brokenId++;
+		}
         private string VariableNameResolver(HtmlNode row)
         {
             var isOptional = row.SelectSingleNode(@".//td[contains(@class,'description')]/span[@class='optional']");
@@ -95,7 +107,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
             }
 
-            return string.Join("|", types);
+			return string.Join("|", types);
 
         }
     }
@@ -123,6 +135,9 @@ namespace SInnovations.Cesium.TypescriptGenerator
         {
             {"Cesium.Property", "Cesium.Property|string" }
         };
+		static ISet<string> excludedClasses = new HashSet<string> {
+			"KmlFeatureData"
+		};
 
         static Dictionary<string, string> classToPath = new Dictionary<string, string>();
         public static StreamWriter GetWriter(string className, string source = ".")
@@ -151,29 +166,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 Directory.Delete("tempOut",true);
 
             Options.BaseUrl = "https://cesiumjs.org/Cesium/Build/Documentation/";
-            Options.Class.Add("Viewer");
-            Options.Class.Add("DefaultProxy");
-            Options.Class.Add("CesiumTerrainProvider");
-            Options.Class.Add("CzmlDataSource");
-            Options.Class.Add("EntityView");
-            Options.Class.Add("ScreenSpaceEventType");
-            Options.Class.Add("TimeIntervalCollectionProperty");
-            Options.Class.Add("DeveloperError");
-            Options.Class.Add("Transforms");
-            Options.Class.Add("defaultValue");
-            Options.Class.Add("isArray");
-            Options.Class.Add("requestAnimationFrame");
-            Options.Class.Add("TerrainProvider");
-            Options.Class.Add("CesiumMath");
-            Options.Class.Add("WebMapTileServiceImageryProvider");
-            Options.Class.Add("WebMercatorTilingScheme");
-            Options.Class.Add("WebMercatorProjection");
-            Options.Class.Add("SampledPositionProperty");
-            Options.Class.Add("VelocityOrientationProperty");
-            Options.Class.Add("Model");
-            Options.Class.Add("viewerCesiumInspectorMixin");
-            Options.Class.Add("BingMapsApi");
-            Options.Class.Add("FrameRateMonitor");
+			HtmlDocument index = GetDocument($"{Options.BaseUrl.TrimEnd('/')}/index.html");
+			var classLinks = index.DocumentNode.SelectNodes(@"//*[@id=""ClassList""]/li");
+			foreach (var link in classLinks) {
+				Options.Class.Add(link.InnerText);
+			}
 
 
             // Options.OutputPath = @"C:\dev\AscendXYZ Portal\typings\Cesium.d.ts";
@@ -183,8 +180,10 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
                 foreach (var name in Options.Class)
                 {
-                    var url = $"{Options.BaseUrl.TrimEnd('/')}/{name}.html";
-                    ExtractCLass(url);
+					if (!excludedClasses.Contains(name)) {
+	                    var url = $"{Options.BaseUrl.TrimEnd('/')}/{name}.html";
+	                    ExtractCLass(url);
+					}
                 }
 
                 var promish = GetWriter("Promise");
@@ -249,8 +248,9 @@ namespace SInnovations.Cesium.TypescriptGenerator
             Console.WriteLine($"Dowloadinging {url}");
             HtmlDocument doc = GetDocument(url);
 
-            var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dd/dl/div") ?? doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dl/div");
-            var source = sourceLinkNode.SelectSingleNode(".//a").InnerText.Substring(0, sourceLinkNode.SelectSingleNode(".//a").InnerText.LastIndexOf(","));
+            // var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dd/dl/div") ?? doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dl/div");
+			var sourceLinkNode = doc.DocumentNode.SelectSingleNode(@"//*[contains(@class, ""source-link"")]");
+            var source = "Source/" + sourceLinkNode.SelectSingleNode(".//a").InnerText.Substring(0, sourceLinkNode.SelectSingleNode(".//a").InnerText.LastIndexOf(" "));
             Console.WriteLine($"Source : {source}");
 
             var classdt = doc.DocumentNode.SelectSingleNode(@"//*[@id=""main""]/section/article/div/dt");
@@ -267,6 +267,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 if (nameMaps.ContainsKey(signatureName))
                     signatureName = nameMaps[signatureName];
 
+				Console.WriteLine ($"Writing: {source}");
                 writer = GetWriter(signatureName, source);
 
                 var optionsParser = new OptionsWriter(signatureName,source);
@@ -294,9 +295,8 @@ namespace SInnovations.Cesium.TypescriptGenerator
                         
                         types = extractDependencies(dependencies, types);
 
-
-                        signature = signature.Replace(name.TrimEnd('?'), $"{name} : {types}");
-
+						var replaceRx = new Regex(@"\b" + name.TrimEnd('?'));
+						signature = replaceRx.Replace(signature, $"{name} : {types}");
                     }
                 }
             }
@@ -419,7 +419,7 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 var types = TypeReader(member.SelectSingleNode(".//span[@class='type-signature']"));
                 types = extractDependencies(dependencies, types);
 
-                writer.WriteLine($"\t{(staticMember != null && !isInterface ? "static " : "")}{memberName}: {types}");
+				writer.WriteLine($"\t{(staticMember != null && !isInterface ? "static " : "")}{memberName}: {types}");
 
             }
 
@@ -471,25 +471,26 @@ namespace SInnovations.Cesium.TypescriptGenerator
                 var signatureParams = optionsParser.GetSignatureTypes(dt.SelectSingleNode(".//following-sibling::dd"));
 
                 var optionalFound = false;
-                signature = $@"({string.Join(", ", signature.Split(',')
-                    .Select(s => s.Trim(')', '(', ' '))
-                    .Select(s =>
-                    {
+				var sigInner = string.Join(", ", signature.Split(',')
+					.Select(s => s.Trim(')', '(', ' '))
+					.Select(s =>
+						{
+							if (signatureParams.ContainsKey(s))
+							{
 
+								// return $"{s + (optionalFound ? "?" : "")} : { extractDependencies(dependencies,signatureParams[s].Replace("Object", "any"))}";
+								return (s + (optionalFound ? "?" : "")) + " : " + extractDependencies(dependencies,signatureParams[s].Replace("Object", "any"));
+							}
+							if (signatureParams.ContainsKey(s + "?"))
+							{
+								optionalFound = true;
+								//return $"{s}? : {extractDependencies(dependencies, signatureParams[s + "?"].Replace("Object", "any"))}";
+								return s + " : " + extractDependencies(dependencies, signatureParams[s + "?"].Replace("Object", "any"));
+							}
+							return s;
 
-                        if (signatureParams.ContainsKey(s))
-                        {
-
-                            return $"{s + (optionalFound ? "?" : "")} : { extractDependencies(dependencies,signatureParams[s].Replace("Object", "any"))}";
-                        }
-                        if (signatureParams.ContainsKey(s + "?"))
-                        {
-                            optionalFound = true;
-                            return $"{s}? : {extractDependencies(dependencies, signatureParams[s + "?"].Replace("Object", "any"))}";
-                        }
-                        return s;
-
-                    }))})";
+						}));
+                signature = "(" + sigInner + ")";
 
 
                 writer.WriteLine($"\t{(staticMember == null ? "" : "static ")}{memberName}{signature.Replace("arguments", "args")} : {typeList}");
@@ -525,8 +526,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
             var type = typeNode.InnerText
                   .Replace(System.Environment.NewLine, " ").Trim(' ', ':');
 
-            if (type.Contains("~"))
-                return "any"; //Do not go to ~links atm
+			Console.WriteLine(type);
+			if (type.Contains("~")) {
+				Console.WriteLine("^^ skipping above");
+            	return "any"; //Do not go to ~links atm
+			}
 
             var links = typeNode.SelectNodes(@".//a");
             if (links != null)
@@ -570,6 +574,10 @@ namespace SInnovations.Cesium.TypescriptGenerator
 
             }
             var returnType = string.Join("|", CollapsGeneric(type.Replace(".&lt;", "<").Split('|')).Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')')))));
+			if (returnType.Contains("~")) {
+				Console.WriteLine($"skipping {returnType} as return");
+				return "any";
+			}
             return TypeReplacer(returnType);
 
 
@@ -605,8 +613,15 @@ namespace SInnovations.Cesium.TypescriptGenerator
         {
             if (type.StartsWith("Array<"))
                 return $"Array<{string.Join("|", type.Substring(6).TrimEnd('>').Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')'))))) }>";
-            if (type.StartsWith("Promise<"))
-                return $"Promise<{string.Join("|", type.Substring(8).TrimEnd('>').Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')', ' '))))) }>";
+			if (type.StartsWith("Promise<")) {
+				var types = Regex.Split(type, @"(?<=\>)\|");
+				if (types.Length > 1) {
+					return string.Join("|", types.Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')')))).ToArray());
+				}
+				var origTypedef = type.Substring(8).TrimEnd('>');
+				var promiseTypes = string.Join("|", origTypedef.Split('|').Select(t => ArrayTypeFixer(TypeNormalizer(t.Trim('(', ')')))));
+                return $"Promise<{promiseTypes}>";
+			}
 
             return type;
         }
@@ -618,6 +633,11 @@ namespace SInnovations.Cesium.TypescriptGenerator
         {
             if (type == null)
                 return "void";
+
+			if (type.Contains("~")) {
+				Console.WriteLine("skipping typenormalizer " + type);
+				return "any";
+			}
 
 
 
